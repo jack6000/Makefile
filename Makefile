@@ -21,6 +21,16 @@ LDFLAGS = -lm
 
 all: $(TARGET_HEX)
 
+$(OBJ): | $(BUILD_DIR) $(BIN_DIR)
+
+# Create build directory if it doesn't exists
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
+
+# Create bin directory if it doesn't exists
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
+
 # Compile all c files
 $(BUILD_DIR)/%.o: %.c
 	@echo "Compiling $<..."
