@@ -36,7 +36,7 @@ $(TARGET_HEX): $(TARGET_OBJ)
 	@echo "\r\nMaking $(TARGET_HEX) file..."
 	$(OBJ-COPY) -j .text -j .data -O ihex $^ $@
 	@echo ""
-	@$(SIZE) --format=avr $(TARGET_OBJ)
+	@$(SIZE) --format=avr --mcu=$(MCU) $(TARGET_OBJ)
 
 .PHONY: program clean
 program:
