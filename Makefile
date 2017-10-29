@@ -1,3 +1,4 @@
+# Makefile for AVR microcontrollers
 TARGET = blink
 
 MCU   = atmega32u4
@@ -10,8 +11,12 @@ SIZE     = avr-size
 BUILD_DIR = build
 BIN_DIR   = bin
 
-SRC = main.c toto.c
-OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
+# If you have source code in different directory,
+# Put the different directory in VPATH, separated by :
+VPATH=.:../
+SRC = main.c toto.c ../truc.c
+SRC2 = $(notdir $(SRC))
+OBJ = $(SRC2:%.c=$(BUILD_DIR)/%.o)
 
 TARGET_OBJ = $(BUILD_DIR)/$(TARGET).o
 TARGET_HEX = $(BIN_DIR)/$(TARGET).hex
@@ -21,13 +26,14 @@ LDFLAGS = -lm
 
 all: $(TARGET_HEX)
 
+# Create 'build' and 'bin' directory if they doesn't exists
 $(OBJ): | $(BUILD_DIR) $(BIN_DIR)
 
-# Create build directory if it doesn't exists
+# Create 'build' directory if it doesn't exists
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-# Create bin directory if it doesn't exists
+# Create 'bin' directory if it doesn't exists
 $(BIN_DIR):
 	@mkdir -p $(BIN_DIR)
 
