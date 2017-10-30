@@ -1,9 +1,9 @@
 # Makefile for AVR microcontrollers
 # --- Final name of the hex file ---
-TARGET = blink
+TARGET = usart
 
 #--- MCU type and speed ---
-MCU   = atmega32u4
+MCU   = atmega328p
 F_CPU = 16000000UL
 
 #--- AVR GCC binutils ---
@@ -19,7 +19,7 @@ BIN_DIR   = bin
 # If you have source code in different directory,
 # Put the different directory in VPATH, separated by :
 VPATH=.:../
-SRC = main.c toto.c ../truc.c
+SRC = main.c fifo.c
 SRC2 = $(notdir $(SRC))
 OBJ = $(SRC2:%.c=$(BUILD_DIR)/%.o)
 
@@ -27,14 +27,22 @@ TARGET_OBJ = $(BUILD_DIR)/$(TARGET).o
 TARGET_HEX = $(BIN_DIR)/$(TARGET).hex
 
 #--- Compiler flags ---
-CFLAGS  = -Wall -O2 -DF_CPU=$(F_CPU) -mmcu=$(MCU)
+CFLAGS  = -DF_CPU=$(F_CPU)
+CFLAGS += -mmcu=$(MCU)
+CFLAGS += -O2
+CFLAGS += -funsigned-char
+CFLAGS += -funsigned-bitfields
+CFLAGS += -fpack-struct
+CFLAGS += -fshort-enums
+CFLAGS += -Wall
+CFLAGS += -Wstrict-prototypes
 
 #--- Linker flags ---
 LDFLAGS = -lm
 
 #--- Avrdude configuration ---
-DUDE_PROGRAMMER = avr109
-DUDE_PORT = /dev/ttyACM0
+DUDE_PROGRAMMER = avrispmkII
+DUDE_PORT = usb
 
 #--- The 'all' target ---
 all: $(TARGET_HEX)
@@ -58,12 +66,12 @@ $(BUILD_DIR)/%.o: %.c
 # Link all .o files into target.o file
 $(TARGET_OBJ): $(OBJ)
 	@echo "\r\nLinking..."
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Produce target.hex file and show usefull informations
 $(TARGET_HEX): $(TARGET_OBJ)
 	@echo "\r\nMaking $(TARGET_HEX) file..."
-	$(OBJ-COPY) -j .text -j .data -O ihex $^ $@
+	$(OBJ-COPY) -R .eeprom -R .fuse -R .lock -O ihex $^ $@
 	@echo ""
 	@$(SIZE) --format=avr --mcu=$(MCU) $(TARGET_OBJ)
 
