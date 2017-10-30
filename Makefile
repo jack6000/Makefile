@@ -1,16 +1,21 @@
 # Makefile for AVR microcontrollers
+# --- Final name of the hex file ---
 TARGET = blink
 
+#--- MCU type and speed ---
 MCU   = atmega32u4
 F_CPU = 16000000UL
 
+#--- AVR GCC binutils ---
 CC       = avr-gcc
 OBJ-COPY = avr-objcopy
 SIZE     = avr-size
 
+#--- Path for generated files ---
 BUILD_DIR = build
 BIN_DIR   = bin
 
+#--- Configuration ----
 # If you have source code in different directory,
 # Put the different directory in VPATH, separated by :
 VPATH=.:../
@@ -21,9 +26,17 @@ OBJ = $(SRC2:%.c=$(BUILD_DIR)/%.o)
 TARGET_OBJ = $(BUILD_DIR)/$(TARGET).o
 TARGET_HEX = $(BIN_DIR)/$(TARGET).hex
 
+#--- Compiler flags ---
 CFLAGS  = -Wall -O2 -DF_CPU=$(F_CPU) -mmcu=$(MCU)
+
+#--- Linker flags ---
 LDFLAGS = -lm
 
+#--- Avrdude configuration ---
+DUDE_PROGRAMMER = avr109
+DUDE_PORT = /dev/ttyACM0
+
+#--- The 'all' target ---
 all: $(TARGET_HEX)
 
 # Create 'build' and 'bin' directory if they doesn't exists
@@ -56,7 +69,7 @@ $(TARGET_HEX): $(TARGET_OBJ)
 
 .PHONY: program clean
 program:
-	avrdude -p $(MCU) -c avr109 -P /dev/ttyACM0 -U flash:w:$(TARGET_HEX)
+	avrdude -p $(MCU) -c $(DUDE_PROGRAMMER) -P $(DUDE_PORT) -U flash:w:$(TARGET_HEX)
 
 clean:
 	rm -f $(OBJ) $(TARGET_OBJ) $(TARGET_HEX)
